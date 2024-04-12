@@ -118,11 +118,11 @@ public class ObjectAction : MonoBehaviour
 
         // Định nghĩa các hướng di chuyển: lên, xuống, trái, phải
         Vector2Int[] directions = {
-        new Vector2Int(0, -1), // Up
-        new Vector2Int(0, 1),  // Down
-        new Vector2Int(-1, 0), // Left
-        new Vector2Int(1, 0)   // Right
-    };
+            new Vector2Int(0, -1), // Up
+            new Vector2Int(0, 1),  // Down
+            new Vector2Int(-1, 0), // Left
+            new Vector2Int(1, 0)   // Right
+        };
 
         // Khởi tạo hàng đợi để duyệt các đỉnh theo BFS
         Queue<Vector2Int> queue = new Queue<Vector2Int>();

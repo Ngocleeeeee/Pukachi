@@ -75,11 +75,12 @@ public class Main : MonoBehaviour
                 }
                 else
                 {
-                    Sprite randomSprite = pikachuSprites[Random.Range(0, pikachuSprites.Length)];
+                    int a = Random.Range(0, pikachuSprites.Length);
+                    Sprite randomSprite = pikachuSprites[a];
                     brick = Instantiate(brickPrefab, gridParent);
                     SpriteRenderer spriteRenderer = brick.GetComponent<SpriteRenderer>();
                     spriteRenderer.sprite = randomSprite;
-                    matrix[row, column] = pikachuSprites.Length;
+                    matrix[row, column] = a + 1;
                 }
 
                 // Đặt vị trí của viên gạch dựa trên hàng và cột, sử dụng kích thước của Sprite và vị trí của Sprite đầu tiên

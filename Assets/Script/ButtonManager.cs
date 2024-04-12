@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Assets.Script.WallMode;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -29,5 +30,12 @@ public class ButtonManager : MonoBehaviour
     public void Wall()
     {
         SceneManager.LoadScene("WallScene");
+    }
+
+
+    public void ResetMatrix()
+    {
+        Base newBase = new Base();
+        newBase.ResetMatrix();
     }
 }
