@@ -9,7 +9,7 @@ using UnityEngine.U2D;
 
 public class ObjectAction : MonoBehaviour
 {
-    private SpriteRenderer selectedImage; // Biến để lưu trữ ảnh đã chọn
+    public SpriteRenderer selectedImage; // Biến để lưu trữ ảnh đã chọn
     public int directionChanges = 0;
     // Start is called before the first frame update
     void Start()
@@ -80,8 +80,10 @@ public class ObjectAction : MonoBehaviour
                 List<Vector2Int> path = FindPath(mainScript.matrix, new Vector2Int(column1, row1), new Vector2Int(column2, row2));
                 // Đếm số lần đổi hướng trái-phải-lên-xuống
                 // Nếu tồn tại đường đi
+                
                 if (path != null)
                 {
+                    PrintPath(path);
                     int directionChanges = CountDirectionChanges(path);
                     //Nếu đường đi khả thi(<=2_, xóa cả hai đối tượng khỏi ma trận và khỏi scene
                     if ( directionChanges <= 2)
@@ -90,11 +92,13 @@ public class ObjectAction : MonoBehaviour
                         Destroy(obj2);
                         mainScript.matrix[row1, column1] = 0;
                         mainScript.matrix[row2, column2] = 0;
+                        mainScript.PrintMatrix();
                         Debug.Log("OK");
                     }
                     else
                     {
-                        Debug.Log("NO");
+                        
+                        Debug.Log("NO :"+directionChanges);
                     }
                 }
                     
@@ -103,6 +107,7 @@ public class ObjectAction : MonoBehaviour
             }
         }
     }
+
     List<Vector2Int> FindPath(int[,] matrix, Vector2Int start, Vector2Int end)
     {
         int rows = matrix.GetLength(0);
@@ -181,7 +186,7 @@ public class ObjectAction : MonoBehaviour
     int CountDirectionChanges(List<Vector2Int> path)
     {
         int directionChanges = 0;
-        if (path.Count > 1)
+        if (path.Count > 2) // Thay đổi điều kiện này từ 1 thành 2 để xử lý trường hợp đặc biệt
         {
             Vector2Int previousDirection = path[1] - path[0];
             for (int i = 2; i < path.Count; i++)
@@ -189,11 +194,32 @@ public class ObjectAction : MonoBehaviour
                 Vector2Int currentDirection = path[i] - path[i - 1];
                 if (currentDirection != previousDirection)
                 {
-                    directionChanges++;
+                    // Kiểm tra xem hướng trước đó có phản ánh hướng đi tiếp theo không
+                    if ((currentDirection.x != -previousDirection.x && currentDirection.y != -previousDirection.y) || i == path.Count - 1)
+                    {
+                        directionChanges++;
+                    }
+                    previousDirection = currentDirection; // Thêm dòng này để cập nhật hướng trước đó
                 }
-                previousDirection = currentDirection;
             }
         }
         return directionChanges;
     }
+
+    void PrintPath(List<Vector2Int> path)
+    {
+        if (path == null)
+        {
+            Debug.Log("Không tìm thấy đường đi.");
+            return;
+        }
+
+        Debug.Log("Đường đi từ điểm xuất phát đến điểm đích:");
+
+        foreach (var point in path)
+        {
+            Debug.Log("(" + point.x + ", " + point.y + ")");
+        }
+    }
+
 }

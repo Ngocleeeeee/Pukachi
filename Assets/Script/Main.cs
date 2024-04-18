@@ -75,11 +75,12 @@ public class Main : MonoBehaviour
                 }
                 else
                 {
-                    Sprite randomSprite = pikachuSprites[Random.Range(0, pikachuSprites.Length)];
+                    int a = Random.Range(0, pikachuSprites.Length);
+                    Sprite randomSprite = pikachuSprites[a];
                     brick = Instantiate(brickPrefab, gridParent);
                     SpriteRenderer spriteRenderer = brick.GetComponent<SpriteRenderer>();
                     spriteRenderer.sprite = randomSprite;
-                    matrix[row, column] = pikachuSprites.Length;
+                    matrix[row, column] = a+1;
                 }
 
                 // Đặt vị trí của viên gạch dựa trên hàng và cột, sử dụng kích thước của Sprite và vị trí của Sprite đầu tiên
@@ -108,9 +109,73 @@ public class Main : MonoBehaviour
                 }
             }
         }
+        //PrintMatrix();
+    }
+    public void PrintMatrix()
+    {
+        string matrixString = "";
+
+        for (int row = 0; row < matrix.GetLength(0); row++)
+        {
+            for (int column = 0; column < matrix.GetLength(1); column++)
+            {
+                matrixString += matrix[row, column] + " ";
+            }
+
+            matrixString += "\n";
+        }
+
+        Debug.Log("Matrix:\n" + matrixString);
     }
 
+        //public void ReloadImages()
+        //{
+        //    // Thực hiện tải lại hình ảnh tương ứng với giá trị mới trong ma trận
+        //    for (int row = 0; row < matrix.GetLength(0); row++)
+        //    {
+        //        for (int column = 0; column < matrix.GetLength(1); column++)
+        //        {
+        //            int value = matrix[row, column];
+        //            GameObject brick = GetGameObjectAtPosition(row, column);
+        //            SpriteRenderer spriteRenderer = brick.GetComponent<SpriteRenderer>();
+        //            Sprite newSprite = GetSpriteByValue(value); // Hàm GetSpriteByValue là hàm của bạn để lấy sprite dựa trên giá trị trong ma trận
+        //            spriteRenderer.sprite = newSprite;
+        //        }
+        //    }
+        //}
+
+        Sprite GetSpriteByValue(int value)
+    {
+        if (value >= 1 && value <= pikachuSprites.Length)
+        {
+            return pikachuSprites[value - 1];
+        }
+        else
+        {
+            Debug.LogError("Invalid value: " + value);
+            return null;
+        }
+    }
+    public GameObject GetGameObjectAtPosition(int row, int column)
+    {
+        int index = row * columns + column;
+        if (index >= 0 && index < gridParent.childCount)
+        {
+            Transform cell = gridParent.GetChild(index);
+            return cell.gameObject;
+        }
+        else
+        {
+            //Debug.LogError("Invalid position: (" + row + ", " + column + ")");
+            return null;
+        }
+    }
+    public int[,] GetMatrix()
+    {
+        return matrix;
+    }
     // Update is called once per frame
+
     void Update()
     {
 

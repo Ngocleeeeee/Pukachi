@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Assets.Script.WallMode;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -24,10 +25,24 @@ public class ButtonManager : MonoBehaviour
     }
     public void Gravitation()
     {
-        SceneManager.LoadScene("GravitationScene");
+        SceneManager.LoadScene("Gravity");
     }
-    public void Wall()
+    public void Wall1()
     {
-        SceneManager.LoadScene("WallScene");
+        SceneManager.LoadScene("Wall");
+    }
+    public void AutoMatch()
+    {
+        SceneManager.LoadScene("AUTOPlayScene");
+    }
+    public void resetMatrix()
+    {
+        Base newB = new Base();
+        newB.ResetMatrix();
+    }
+    public void Hint()
+    {
+        Cell_AI cell_AI = new Cell_AI();
+        cell_AI.Hint();
     }
 }
