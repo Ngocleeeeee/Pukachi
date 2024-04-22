@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!181963792 &2655988077585873504
+Preset:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: _InitialScript
+  m_TargetType:
+    m_NativeTypeID: 114
+    m_ManagedTypePPtr: {fileID: 11500000, guid: 4a9cf4a8243c5b34da6c56f5877f13c2, type: 3}
+    m_ManagedTypeFallback: 
+  m_Properties:
+  - target: {fileID: 0}
+    propertyPath: m_Enabled
+    value: 1
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorHideFlags
+    value: 0
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: m_EditorClassIdentifier
+    value: 
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: lstSprites.Array.size
+    value: 14
+    objectReference: {fileID: 0}
+  - target: {fileID: 0}
+    propertyPath: lstSprites.Array.data[0]
+    value: 
+    objectReference: {fileID: 21300000, guid: 9e532f1a7bb3b4344b0fb9553a165585, type: 3}
+  - target: {fileID: 0}
+    propertyPath: lstSprites.Array.data[1]
+    value: 
+    objectReference: {fileID: 21300000, guid: c30b50efe6b31464989bc2fa6fa66fc2, type: 3}
+  - target: {fileID: 0}
+    propertyPath: lstSprites.Array.data[2]
+    value: 
+    objectReference: {fileID: 21300000, guid: 2ff64f9f2d079ca41b43d69d0c4375eb, type: 3}
+  - target: {fileID: 0}
+    propertyPath: lstSprites.Array.data[3]
+    value: 
+    objectReference: {fileID: 21300000, guid: b018671cdcf080647aee5f9117e2c71a, type: 3}
+  - target: {fileID: 0}
+    propertyPath: lstSprites.Array.data[4]
+    value: 
+    objectReference: {fileID: 21300000, guid: 1b7605ff91eb80c4bb59afb43ead3fc4, type: 3}
+  - target: {fileID: 0}
+    propertyPath: lstSprites.Array.data[5]
+    value: 
+    objectReference: {fileID: 21300000, guid: 993bc15221cd61948b3dc513562b4ec8, type: 3}
+  - target: {fileID: 0}
+    propertyPath: lstSprites.Array.data[6]
+    value: 
+    objectReference: {fileID: 21300000, guid: 907e8059f8e68ae47a452ac4244dfd5a, type: 3}
+  - target: {fileID: 0}
+    propertyPath: lstSprites.Array.data[7]
+    value: 
+    objectReference: {fileID: 21300000, guid: 2ef8b37492e37cb47975d91421f13d00, type: 3}
+  - target: {fileID: 0}
+    propertyPath: lstSprites.Array.data[8]
+    value: 
+    objectReference: {fileID: 21300000, guid: 95be141733a64cd4b8caa4ac851a0c0c, type: 3}
+  - target: {fileID: 0}
+    propertyPath: lstSprites.Array.data[9]
+    value: 
+    objectReference: {fileID: 21300000, guid: 78ee6990ec7376b48be18f698b7b71e8, type: 3}
+  - target: {fileID: 0}
+    propertyPath: lstSprites.Array.data[10]
+    value: 
+    objectReference: {fileID: 21300000, guid: b77491c8c5ebb7f4d9c37544a717b8db, type: 3}
+  - target: {fileID: 0}
+    propertyPath: lstSprites.Array.data[11]
+    value: 
+    objectReference: {fileID: 21300000, guid: 826aae7ed8f76f64398a870175d40f53, type: 3}
+  - target: {fileID: 0}
+    propertyPath: lstSprites.Array.data[12]
+    value: 
+    objectReference: {fileID: 21300000, guid: aa29910b653daa842a1df9e42e016c7e, type: 3}
+  - target: {fileID: 0}
+    propertyPath: lstSprites.Array.data[13]
+    value: 
+    objectReference: {fileID: 21300000, guid: 024a71ca2880319459319392f46d552a, type: 3}
+  - target: {fileID: 0}
+    propertyPath: gridParent
+    value: 
+    objectReference: {fileID: 0}
+  m_ExcludedProperties: []

@@ -1,0 +1,4 @@
+repository "Pikachu@zaihole2003@cloud"
+  path "/"
+    br "/main"
+    co "/main"

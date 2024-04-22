@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/_MenuScene.unity
+    guid: 794354a4644340a45ac77aedd079441d
+  - enabled: 1
+    path: Assets/Scenes/_OptionsScene.unity
+    guid: 5f660148894731b4da30e59b6da5383d
+  - enabled: 1
+    path: Assets/Scenes/_ModeScene.unity
+    guid: 92ddc11d39246e64d8b12eeaf3cff74a
+  - enabled: 1
+    path: Assets/Scenes/ModeClassic.unity
+    guid: 4c523215f4c3e974785e7ba9c9b04b36
+  - enabled: 1
+    path: Assets/Scenes/ModeGravity.unity
+    guid: ac825b644fbf45249808959acc4661c1
+  - enabled: 1
+    path: Assets/Scenes/ModeWall.unity
+    guid: cf307c41e55f16b428cc35297d700873
+  - enabled: 1
+    path: Assets/Scenes/PlayAUTOPlayScene.unity
+    guid: f2490f77525b87145938fe211f6f5376
+  - enabled: 1
+    path: Assets/Scenes/PlayClassic.unity
+    guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/PlayGravity.unity
+    guid: 8530a9ab17cf4d34cb0b596e6e6de088
+  - enabled: 1
+    path: Assets/Scenes/PlayWall.unity
+    guid: d7ec00d34baf47645b67a7604416f1c7
+  m_configObjects: {}
