@@ -13,8 +13,8 @@ namespace Assets.Script.AutoMatch
         public static Transform gridParent;
         public static Dictionary<int, int> FREQUENCY = new Dictionary<int, int>()
         {
-            {1, 6 },
-            {2, 6 },
+            {1, 6},
+            {2, 6},
             {3, 6},
             {4, 6},
             {5, 6},
@@ -25,9 +25,12 @@ namespace Assets.Script.AutoMatch
             {10,6 },
             {11, 6},
             {12, 6}
-
         };
-   
+        public static bool IsMatrixNull()
+        {
+            if (!FREQUENCY.ContainsKey(0)) return false;
+            return FREQUENCY[0] == m * n;
+        }
         public void GenerateMatrix(int m, int n)
         {
             

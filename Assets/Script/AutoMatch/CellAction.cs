@@ -1,4 +1,6 @@
-﻿using Assets.Script.WallMode;
+﻿using Assets.Script.Classic;
+using Assets.Script.Gravity;
+using Assets.Script.WallMode;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,7 +21,8 @@ namespace Assets.Script.AutoMatch
         public _InitialScriptAI initialScript;
 
         public int directionChanges = 0;
-        public static int score, size;
+        public static int size;
+        public int score;
         public float lineWidth = 0.16f;
 
         public UnityEngine.Color c1 = UnityEngine.Color.yellow;
@@ -42,7 +45,6 @@ namespace Assets.Script.AutoMatch
             lineObject = new GameObject("line");
             lineObject.transform.SetParent(BaseAI.gridParent);
             score = 0;
-            UpdateScoreText();
             // Thêm component LineRenderer vào game object mới
             lineRenderer = lineObject.AddComponent<LineRenderer>();
             size = initialScript.getSize();
@@ -90,14 +92,14 @@ namespace Assets.Script.AutoMatch
 
         public virtual void CheckFinalScore(int score)
         {
-            if (size == 0 || !countdownTimer.isCountingDown)
+            if (BaseAI.IsMatrixNull() || countdownTimer.getCurrentTime()<=0f)
             {
-                score = (score != 0) ? score * Mathf.CeilToInt(countdownTimer.getCurrentTime())
-                    : (Mathf.CeilToInt(countdownTimer.getCurrentTime()) * CheckPoint() / 2);
-                finalScoreText.text = score.ToString();
-
+                //score += Mathf.CeilToInt(countdownTimer.GetTimeInterval());
+                /*score = (score != 0) ? score+ Mathf.CeilToInt(countdownTimer.getCurrentTime()) 
+                    : (Mathf.CeilToInt(countdownTimer.getCurrentTime())*CheckPoint()/2);*/
+                finalScoreText.text = "Total: " + score.ToString();
+                countdownTimer.CountdownFinished();
             }
-
         }
 
         public int CheckPoint()
@@ -168,7 +170,10 @@ namespace Assets.Script.AutoMatch
         public virtual List<Cell> FindPath(Cell cellStart, Cell cellFinal)
         {
             if (!BaseAI.IsCellInMaxtrix(cellStart) || !BaseAI.IsCellInMaxtrix(cellFinal)) return null;
-
+            foreach (var cellAround in cellStart.Move(cellFinal))
+            {
+                if (cellAround.Equals(cellFinal)) return new List<Cell>() { cellStart, cellFinal };
+            }
             // Khởi tạo hàng đợi để duyệt các đỉnh theo BFS
             Queue<Cell> queue = new Queue<Cell>();
             queue.Enqueue(cellStart);
@@ -402,7 +407,7 @@ namespace Assets.Script.AutoMatch
         {
             if (countdownTimer.isCountingDown)
             {
-                score += 1;
+                score += Mathf.CeilToInt(countdownTimer.getCurrentTime() / 5);
 
                 UpdateScoreText();
             }
@@ -425,6 +430,7 @@ namespace Assets.Script.AutoMatch
                 {
                     for (int j = 1; j <= BaseAI.n; j++)
                     {
+                        if (BaseGravity.MATRIX[i, j] == 0) continue;
                         GameObject obj = GameObject.Find(i + "," + j);
 
                         if (obj != null)
@@ -464,6 +470,7 @@ namespace Assets.Script.AutoMatch
             {
                 for (int l = 1; l <= BaseAI.n; l++)
                 {
+                    if (BaseGravity.MATRIX[k, l] == 0) continue;
                     GameObject obj2 = GameObject.Find(k + "," + l);
                     if (obj2 != null && obj != null)
                     {

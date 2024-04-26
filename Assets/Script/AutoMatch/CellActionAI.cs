@@ -5,12 +5,16 @@ namespace Assets.Script.AutoMatch
 {
     public class CellActionAI : CellAction
     {
-
+        public static bool isAutoMatching = true;
         public float delayBetweenMatches = 0.5f;
         // Start is called before the first frame update
         void Start()
         {
             StartProcess();
+            
+        }
+        void Update()
+        {
             CheckFinalScore(score);
         }
 
@@ -18,8 +22,6 @@ namespace Assets.Script.AutoMatch
         {
             lineObject = new GameObject("line");
             lineObject.transform.SetParent(BaseAI.gridParent);
-            score = 0;
-            UpdateScoreText();
             // Thêm component LineRenderer vào game object mới
             lineRenderer = lineObject.AddComponent<LineRenderer>();
             StartCoroutine(AutoMatchAll());
@@ -28,58 +30,85 @@ namespace Assets.Script.AutoMatch
 
         // public bool isPaused = false;
 
-        public IEnumerator AutoMatchAll()
+        //----------------------------
+        public void SetAutoMatching(bool value)
         {
-            bool allCellsProcessed = false;
-
-            while (!allCellsProcessed)
+            isAutoMatching = value;
+            Debug.Log("SET" + value);
+        }
+        IEnumerator AutoMatchAll()
+        {
+            while (true) // Vòng lặp vô hạn
             {
+                Debug.Log("isauto matching" + IsAutoMatching());
 
-                allCellsProcessed = true;
+                // Kiểm tra trạng thái của isAutoMatching trước mỗi lần lặp
 
+
+                bool allCellsProcessed = true; // Gán allCellsProcessed = true mặc định
+
+                // Kiểm tra mỗi ô trong ma trận
                 for (int i = 1; i <= BaseAI.m; i++)
                 {
                     for (int j = 1; j <= BaseAI.n; j++)
                     {
+                        if (BaseAI.MATRIX[i, j] == 0) continue;
                         GameObject obj = GameObject.Find(i + "," + j);
-
                         if (obj != null)
                         {
                             RestoreOriginalColor(obj.GetComponent<SpriteRenderer>());
                             yield return new WaitForSeconds(delayBetweenMatches);
                             CheckAndProcessMatrix3(obj);
+                            if (IsAutoMatching() == false)
+                            {
+                                //Hien panel 
+                                yield break; // Nếu isAutoMatching là false, thoát coroutine
 
+                            }
                             if (BaseAI.MATRIX[i, j] != 0)
                             {
-                                allCellsProcessed = false;
+                                allCellsProcessed = false; // Nếu còn ô chưa xử lý, đặt allCellsProcessed = false
                             }
                         }
                     }
                 }
 
+                // Nếu tất cả các ô đã được xử lý hoặc hết thời gian đếm ngược
+                /*if (allCellsProcessed || size == 0 || countdownTimer.getCurrentTime() <= 0f)
+                {
+                    //hien panel end game
+                    score *= Mathf.CeilToInt(countdownTimer.getCurrentTime());
+                    UpdateScoreText();
+                    Debug.Log("end game");
+                    yield break; // Kết thúc coroutine
+                }*/
+
                 yield return null; // Yielding null allows other coroutine operations to execute.
             }
-
-            if (size == 0 || countdownTimer.getCurrentTime() == 0f)
-            {
-                score *= Mathf.CeilToInt(countdownTimer.getCurrentTime());
-                UpdateScoreText();
-                Debug.Log("end game");
-            }
-            Debug.Log("All cells have been processed.");
         }
 
-        // Function to pause the AutoMatchAll coroutine
-        public void PauseAutoMatchAll()
+
+        private bool IsAutoMatching()
         {
-            StopCoroutine(AutoMatchAll());
+            
+            Debug.Log("end game" + isAutoMatching);
+            return isAutoMatching;
         }
 
-        // Function to resume the AutoMatchAll coroutine
-        public void ResumeAutoMatchAll()
+        // Gọi phương thức này từ nơi bạn muốn cập nhật giá trị của isAutoMatching
+        public void PauseAutoMatching()
         {
+            SetAutoMatching(false);
+            //muon pause thi se sett false
+        }
+
+        public void ResumeAutoMatching()
+        {
+            SetAutoMatching(true);
             StartCoroutine(AutoMatchAll());
         }
+
+        //--------------------------
 
         void CheckAndProcessMatrix3(GameObject obj)
         {
@@ -109,6 +138,7 @@ namespace Assets.Script.AutoMatch
             {
                 for (int l = 1; l <= BaseAI.n; l++)
                 {
+                    if (BaseAI.MATRIX[k, l] == 0) continue;
                     GameObject obj2 = GameObject.Find(k + "," + l);
                     if (obj2 != null && obj != null)
                     {

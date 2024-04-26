@@ -35,6 +35,12 @@ namespace Assets.Script.Gravity
 
         };
 
+        public static bool IsMatrixNull()
+        {
+            if (!FREQUENCY.ContainsKey(0)) return false;
+            return FREQUENCY[0] == m * n;
+        } 
+
         public void GenerateMatrix(int m, int n)
         {
 

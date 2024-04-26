@@ -8,19 +8,19 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/_MenuScene.unity
     guid: 794354a4644340a45ac77aedd079441d
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/_OptionsScene.unity
     guid: 5f660148894731b4da30e59b6da5383d
   - enabled: 1
     path: Assets/Scenes/_ModeScene.unity
     guid: 92ddc11d39246e64d8b12eeaf3cff74a
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ModeClassic.unity
     guid: 4c523215f4c3e974785e7ba9c9b04b36
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ModeGravity.unity
     guid: ac825b644fbf45249808959acc4661c1
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ModeWall.unity
     guid: cf307c41e55f16b428cc35297d700873
   - enabled: 1

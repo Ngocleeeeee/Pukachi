@@ -16,6 +16,8 @@ TagManager:
   - trackObj
   - wallObj
   - finalScore
+  - Audio
+  - MusicToggle
   layers:
   - Default
   - TransparentFX

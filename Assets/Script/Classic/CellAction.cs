@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Script.Gravity;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,7 +21,8 @@ namespace Assets.Script.Classic
         
 
         public int directionChanges = 0;
-        public static int score, size;
+        public static int size;
+        public int score;
         public float lineWidth = 0.16f;
 
         public UnityEngine.Color c1 = UnityEngine.Color.yellow;
@@ -43,7 +45,6 @@ namespace Assets.Script.Classic
             lineObject = new GameObject("line");
             lineObject.transform.SetParent(BaseClassic.gridParent);
             score = 0;
-            UpdateScoreText();
             // Thêm component LineRenderer vào game object mới
             lineRenderer = lineObject.AddComponent<LineRenderer>();
             size = initialScript.getSize();
@@ -91,12 +92,13 @@ namespace Assets.Script.Classic
 
         public virtual void CheckFinalScore(int score)
         {
-            if (size == 0 || !countdownTimer.isCountingDown)
+            if (BaseClassic.IsMatrixNull() || countdownTimer.getCurrentTime() <= 0f)
             {
-                score = (score != 0) ? score* Mathf.CeilToInt(countdownTimer.getCurrentTime()) 
-                    : (Mathf.CeilToInt(countdownTimer.getCurrentTime())*CheckPoint()/2);
-                finalScoreText.text = score.ToString();
-                
+                //score += Mathf.CeilToInt(countdownTimer.GetTimeInterval());
+                /*score = (score != 0) ? score+ Mathf.CeilToInt(countdownTimer.getCurrentTime()) 
+                    : (Mathf.CeilToInt(countdownTimer.getCurrentTime())*CheckPoint()/2);*/
+                finalScoreText.text = "Total: " + score.ToString();
+                countdownTimer.CountdownFinished();
             }
             
         }
@@ -170,7 +172,10 @@ namespace Assets.Script.Classic
         public virtual List<Cell> FindPath(Cell cellStart, Cell cellFinal)
         {
             if (!BaseClassic.IsCellInMaxtrix(cellStart) || !BaseClassic.IsCellInMaxtrix(cellFinal)) return null;
-
+            foreach (var cellAround in cellStart.Move(cellFinal))
+            {
+                if (cellAround.Equals(cellFinal)) return new List<Cell>() { cellStart, cellFinal };
+            }
             // Khởi tạo hàng đợi để duyệt các đỉnh theo BFS
             Queue<Cell> queue = new Queue<Cell>();
             queue.Enqueue(cellStart);
@@ -404,7 +409,7 @@ namespace Assets.Script.Classic
         {
             if (countdownTimer.isCountingDown)
             {
-                score += 1;
+                score += Mathf.CeilToInt(countdownTimer.getCurrentTime()/5);
 
                 UpdateScoreText();
             }
@@ -427,6 +432,7 @@ namespace Assets.Script.Classic
                 {
                     for (int j = 1; j <= BaseClassic.n; j++)
                     {
+                        if (BaseClassic.MATRIX[i, j] == 0) continue;
                         GameObject obj = GameObject.Find(i + "," + j);
 
                         if (obj != null)
@@ -466,6 +472,7 @@ namespace Assets.Script.Classic
             {
                 for (int l = 1; l <= BaseClassic.n; l++)
                 {
+                    if (BaseClassic.MATRIX[k, l] == 0) continue;
                     GameObject obj2 = GameObject.Find(k + "," + l);
                     if (obj2 != null && obj != null)
                     {

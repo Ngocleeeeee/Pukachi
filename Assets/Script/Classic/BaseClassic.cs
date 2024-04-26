@@ -27,7 +27,13 @@ namespace Assets.Script.Classic
             {12, 6}
 
         };
-   
+
+        public static bool IsMatrixNull()
+        {
+            if (!FREQUENCY.ContainsKey(0)) return false;
+            return FREQUENCY[0] == m * n;
+        }
+
         public void GenerateMatrix(int m, int n)
         {
             

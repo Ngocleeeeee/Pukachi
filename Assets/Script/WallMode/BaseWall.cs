@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets.Script.WallMode
 {
@@ -7,20 +8,16 @@ namespace Assets.Script.WallMode
     // Constant Object: Sprites
     public class BaseWall
     {
-        public static bool _auto = false;
-        public bool MakeAuto()
-        {
-            return _auto = true;
-        }
-
         public static int[,] MATRIX;
         public static int m, n;
         public static Sprite[] lstSprites; // cố định
         public static Transform gridParent;
+        public static int HintCnt = 5;
+        public static int ResetCnt = 2;
         public static Dictionary<int, int> FREQUENCY = new Dictionary<int, int>()
         {
-            {1, 6 },
-            {2, 6 },
+            {1, 6},
+            {2, 6},
             {3, 6},
             {4, 6},
             {5, 6},
@@ -28,24 +25,36 @@ namespace Assets.Script.WallMode
             {7, 6},
             {8, 6},
             {9, 6},
-            {10,6 },
-            {11, 6},
-            {12, 6}
+            {10,6},
+            {11,6},
+            {12,6}
 
         };
-   
+        public static void SetHelp(int hint, int reset)
+        {
+            HintCnt = hint;
+            ResetCnt = reset;
+            SetButton(0, "Reset (" + reset + ")");
+            SetButton(1, "Hint (" + hint + ")");
+        }
+        public static void SetButton(int index, string text)
+        {
+            GameObject canvasObject = GameObject.Find("Canvas");
+            Button btnReset = canvasObject.transform.GetChild(index).GetComponent<Button>();
+            Text buttonText = btnReset.GetComponentInChildren<Text>();
+            buttonText.text = text;
+        }
         public void GenerateMatrix(int m, int n)
         {
-
             BaseWall.m = m;
             BaseWall.n = n;
             //Around
-            MATRIX = new int[m + 2,n + 2];
+            MATRIX = new int[m + 2, n + 2];
             for (int i = 0; i < m + 2; i++)
             {
                 for (int j = 0; j < n + 2; j++)
                 {
-                    MATRIX[i,j] = 0;
+                    MATRIX[i, j] = 0;
                 }
             }
 
@@ -57,16 +66,15 @@ namespace Assets.Script.WallMode
             //Inside
             RandomMatrix(m, n);
             RenderMatrix(m, n);
-            LogMatrix(MATRIX);
         }
 
-        public virtual void RenderMatrix(int m, int n)
+        private void RenderMatrix(int m, int n)
         {
             GameObject gridParentObject = GameObject.FindWithTag("Grid");
 
             var brickPrefab = GameObject.FindWithTag("firstOBJ");
             var brickHelp = GameObject.FindWithTag("zeroOBJ");
-            
+
             if (gridParentObject != null)
             {
                 gridParent = gridParentObject.transform;
@@ -80,11 +88,11 @@ namespace Assets.Script.WallMode
             var firstSpriteY = brickPrefab.transform.position.y;
             //LogMatrix(MATRIX);
 
-            for (int i = 0; i < m+2; i++)
+            for (int i = 0; i < m + 2; i++)
             {
-                for (int j = 0; j < n+2; j++)
+                for (int j = 0; j < n + 2; j++)
                 {
-                    var val = MATRIX[i, j] ;
+                    var val = MATRIX[i, j];
                     GameObject brick;
                     if (val == 0 && i != 0 && j != 0 && i != m + 1 && j != n + 1) continue;
                     if (val == 0 || val == -1)
@@ -93,7 +101,7 @@ namespace Assets.Script.WallMode
                     }
                     else
                     {
-                        Sprite selectedSprite =lstSprites[val];
+                        Sprite selectedSprite = lstSprites[val];
                         brick = GameObject.Instantiate(brickPrefab, gridParent);
                         SpriteRenderer spriteRenderer = brick.GetComponent<SpriteRenderer>();
                         spriteRenderer.sprite = selectedSprite;
@@ -105,13 +113,13 @@ namespace Assets.Script.WallMode
                     brick.transform.position = new Vector3(xPosition, yPosition, 0);
                     //brick.tag = val.ToString();
                     brick.name = i + "," + j;
-                    
+
 
                 }
             }
         }
 
-        public virtual void RandomMatrix(int m, int n)
+        private void RandomMatrix(int m, int n)
         {
             System.Random random = new System.Random();
 
@@ -135,13 +143,13 @@ namespace Assets.Script.WallMode
                 numbers[i] = numbers[randomIndex];
                 numbers[randomIndex] = temp;
             }
-            
+
 
             // Đặt các số từ danh sách vào vị trí ngẫu nhiên trong ma trận
             int index = 0;
-            for (int i = 1; i < m+1; i++)
+            for (int i = 1; i < m + 1; i++)
             {
-                for (int j = 1; j < n+1; j++)
+                for (int j = 1; j < n + 1; j++)
                 {
                     MATRIX[i, j] = numbers[index];
                     index++;
@@ -149,7 +157,7 @@ namespace Assets.Script.WallMode
             }
         }
 
-        public virtual void ResetMatrix()
+        public void ResetMatrix()
         {
             GameObject gridParentObject = GameObject.FindWithTag("Grid");
 
@@ -176,7 +184,7 @@ namespace Assets.Script.WallMode
         {
             int m = BaseWall.MATRIX.GetLength(0);
             int n = BaseWall.MATRIX.GetLength(1);
-            if (cell.i < 0 || cell.i >=m || cell.j <0 || cell.j >= n)
+            if (cell.i < 0 || cell.i >= m || cell.j < 0 || cell.j >= n)
             {
                 Debug.Log("Cell out of MATRIX");
                 return false;
@@ -195,14 +203,14 @@ namespace Assets.Script.WallMode
             if (!name.Contains(",")) return null;
             var cellInfor = name.Split(',');
             int i, j;
-            int.TryParse(cellInfor[0],out i);
-            int.TryParse(cellInfor[1],out j);
+            int.TryParse(cellInfor[0], out i);
+            int.TryParse(cellInfor[1], out j);
             if (i == 0 || j == 0 || i == BaseWall.m + 1 || j == BaseWall.n + 1) return null;
             return new Cell(i, j);
-           
+
         }
 
-        public virtual void LogMatrix(int[,] matrix)
+        void LogMatrix(int[,] matrix)
         {
             int rows = matrix.GetLength(0);
             int columns = matrix.GetLength(1);
@@ -219,8 +227,7 @@ namespace Assets.Script.WallMode
                 Debug.Log(rowString.Trim());
             }
         }
-
-        public static Cell GetCellFromPosition(int row,int colum)
+        public static Cell GetCellFromPosition(int row, int colum)
         {
             Sprite firstSprite = lstSprites[0];
             float brickWidth = firstSprite.bounds.size.x;
@@ -235,9 +242,46 @@ namespace Assets.Script.WallMode
             return new Cell(i, j);
         }
 
+        public static bool IsMatrixNull()
+        {
+            if (!FREQUENCY.ContainsKey(0)) return false;
+            return FREQUENCY[0] == m * n;
+        }
 
+        public void drawHint(GameObject obj1, GameObject obj2)
+        {
+            var renderer1 = obj1.GetComponent<SpriteRenderer>();
+            var renderer2 = obj2.GetComponent<SpriteRenderer>();
+            SetHighlightedColor(renderer1);
+            SetHighlightedColor(renderer2);
+        }
 
+        public void SetHighlightedColor(SpriteRenderer renderer)
+        {
+            renderer.color = UnityEngine.Color.blue;
+        }
+        public void showHint()
+        {
+            if (isNullCacheHint())
+            {
+                Debug.Log("<color=red>NO HINT FOUND</color>");
+                return;
+            }
+            var obj1 = CellAction.cacheHint.Item1;
+            var obj2 = CellAction.cacheHint.Item2;
+            drawHint(obj1, obj2);
+        }
+        public bool isNullCacheHint()
+        {
+            if (CellAction.cacheHint == null) return true;
+            if (CellAction.cacheHint.Item1 == null || CellAction.cacheHint.Item2 == null)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 
+    
 
 }

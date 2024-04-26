@@ -1,5 +1,4 @@
-﻿using Assets.Script.Gravity;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,48 +7,46 @@ namespace Assets.Script.WallMode
 {
     public class CellAction : MonoBehaviour
     {
-        public SpriteRenderer selectedImage; // Biến để lưu trữ ảnh đã chọn
-        public Dictionary<Cell, Cell> PARENT;
+        private SpriteRenderer selectedImage; // Biến để lưu trữ ảnh đã chọn
+        public int directionChanges = 0;
+        Dictionary<Cell, Cell> PARENT;
+        Cell CELL_FINAL, CELL_START;
         public Material lineMaterial;
-        public GameObject lineObject;
-        public LineRenderer lineRenderer;
+        public float lineWidth = 0.16f;
+        UnityEngine.Color c1;
+        UnityEngine.Color c2;
+        //GameObject lineObject;
+        //LineRenderer lineRenderer;
         public Text scoreText, finalScoreText;
-        public Cell CELL_FINAL, CELL_START;
+        private int score;
         public CountdownTimer countdownTimer;
         public _InitialScriptWall initialScript;
-
-        public int directionChanges = 0;
-        public static int score, size;
-        public float lineWidth = 0.16f;
-
-        public UnityEngine.Color c1 = UnityEngine.Color.yellow;
-        public UnityEngine.Color c2 = UnityEngine.Color.red;
-        public UnityEngine.Color highlightColor = UnityEngine.Color.blue;
+        public static Tuple<GameObject, GameObject> cacheHint = null;
+        BaseWall resetBase;
         // Start is called before the first frame update
         void Start()
         {
+            c1 = UnityEngine.Color.yellow;
+            c2 = UnityEngine.Color.red;
 
+            // Thêm component LineRenderer vào game object mới
+            //lineRenderer = lineObject.AddComponent<LineRenderer>();
+            score = 0;
+            resetBase = new BaseWall();
+            if (isNullCacheHint())
+            {
+                cacheHint = getObjHint();
+                while (isNullCacheHint() && !BaseWall.IsMatrixNull())
+                {
+                    resetBase.ResetMatrix();
+                    cacheHint = getObjHint();
+                }
+            }
         }
+
 
         // Update is called once per frame
         void Update()
-        {
-
-        }
-
-        public virtual void StartProcess()
-        {
-            lineObject = new GameObject("line");
-            lineObject.transform.SetParent(BaseWall.gridParent);
-            score = 0;
-            UpdateScoreText();
-            // Thêm component LineRenderer vào game object mới
-            lineRenderer = lineObject.AddComponent<LineRenderer>();
-            size = initialScript.getSize();
-
-        }
-
-        public virtual void UpdateProcess()
         {
             if (Input.GetMouseButtonDown(0)) // Kiểm tra khi nhấn chuột trái
             {
@@ -60,7 +57,6 @@ namespace Assets.Script.WallMode
 
                     if (clickedImage != null && clickedImage != selectedImage) // Kiểm tra xem ảnh được chọn có hợp lệ và không phải là ảnh đã được chọn trước đó
                     {
-
                         if (selectedImage == null) // Nếu đây là ảnh đầu tiên được chọn
                         {
                             selectedImage = clickedImage;
@@ -70,7 +66,6 @@ namespace Assets.Script.WallMode
                             if (selectedImage.sprite == clickedImage.sprite) // Kiểm tra nếu hai ảnh giống nhau
                             {
                                 // Kiểm tra và xử lý ma trận
-
                                 CheckAndProcessMatrix(selectedImage.gameObject, clickedImage.gameObject);
 
                                 // Đặt selectedImage về null để chuẩn bị cho việc chọn ảnh mới
@@ -86,39 +81,24 @@ namespace Assets.Script.WallMode
                     }
                 }
             }
+            CheckFinalScore(score);
         }
 
         public virtual void CheckFinalScore(int score)
         {
-            if (size == 0 || !countdownTimer.isCountingDown)
+            if (BaseWall.IsMatrixNull() || countdownTimer.getCurrentTime() <= 0f)
             {
-                score = (score != 0) ? score * Mathf.CeilToInt(countdownTimer.getCurrentTime())
-                    : (Mathf.CeilToInt(countdownTimer.getCurrentTime()) * CheckPoint() / 2);
-                finalScoreText.text = score.ToString();
-
+                //score += Mathf.CeilToInt(countdownTimer.GetTimeInterval());
+                /*score = (score != 0) ? score+ Mathf.CeilToInt(countdownTimer.getCurrentTime()) 
+                    : (Mathf.CeilToInt(countdownTimer.getCurrentTime())*CheckPoint()/2);*/
+                finalScoreText.text = "Total: " + score.ToString();
+                countdownTimer.CountdownFinished();
             }
 
-        }
-
-        public int CheckPoint()
-        {
-            int point = 0;
-            for (int column = 1; column < BaseWall.MATRIX.GetLength(1) - 1; column++)
-            {
-                for (int row = 1; row < BaseWall.MATRIX.GetLength(0) - 1; row++)
-                {
-                    if (BaseWall.MATRIX[row, column] == 0)
-                    {
-                        point++;
-
-                    }
-                }
-            }
-            return point;
         }
 
         // Kiểm tra và xử lý ma trận
-        public virtual void CheckAndProcessMatrix(GameObject obj1, GameObject obj2)
+        void CheckAndProcessMatrix(GameObject obj1, GameObject obj2)
         {
 
             var cell1 = BaseWall.GetCell(obj1.name);
@@ -137,9 +117,10 @@ namespace Assets.Script.WallMode
                     // Vẽ đường thẳng đỏ giữa các vị trí
                     var lstPos = GetListPosition(path);
                     DrawPath(lstPos);
+                    if (isObjHint(obj1, obj2)) cacheHint = null;
                     Destroy(obj1);
                     Destroy(obj2);
-                    size = size - 2;
+
                     IncreaseScore();
                     var val1 = BaseWall.MATRIX[cell1.i, cell1.j];
 
@@ -154,21 +135,35 @@ namespace Assets.Script.WallMode
                     BaseWall.MATRIX[cell2.i, cell2.j] = 0;
                     Debug.Log(DateTime.Now.Millisecond + "<color=green>SUCCESS</color>");
 
+                    //WALL MODE
+                    Wall.RemoveABrick();
+                    if (isNullCacheHint())
+                    {
+                        cacheHint = getObjHint();
+                        while (isNullCacheHint() && !BaseWall.IsMatrixNull())
+                        {
+                            resetBase.ResetMatrix();
+                            //cacheHint = getObjHint();
+                            cacheHint = getObjHint();
+                        }
+                    }
+                    //isAutoPlay = true;
                 }
                 else
                 {
                     // var pathRetry = FindPath(cell2, cell1);
                     Debug.Log(DateTime.Now.Millisecond + "<color=red>NO PATH FOUND</color>");
-
                 }
 
             }
         }
-
-        public virtual List<Cell> FindPath(Cell cellStart, Cell cellFinal)
+        List<Cell> FindPath(Cell cellStart, Cell cellFinal)
         {
             if (!BaseWall.IsCellInMaxtrix(cellStart) || !BaseWall.IsCellInMaxtrix(cellFinal)) return null;
-
+            foreach (var cellAround in cellStart.Move(cellFinal))
+            {
+                if (cellAround.Equals(cellFinal)) return new List<Cell>() { cellStart, cellFinal };
+            }
             // Khởi tạo hàng đợi để duyệt các đỉnh theo BFS
             Queue<Cell> queue = new Queue<Cell>();
             queue.Enqueue(cellStart);
@@ -191,7 +186,6 @@ namespace Assets.Script.WallMode
                     else
                     {
                         Debug.Log(DateTime.Now.Millisecond + "<color=yellow>PATH > 2</color>");
-                        Debug.Log("------------ERROR-----------");
                         continue;
                     }
                 }
@@ -226,7 +220,7 @@ namespace Assets.Script.WallMode
 
         }
 
-        public virtual List<Cell> DFS(Cell cellCurrent)
+        private List<Cell> DFS(Cell cellCurrent)
         {
             var path = GetPath(cellCurrent, CELL_START, PARENT);
             if (cellCurrent.Equals(CELL_FINAL))
@@ -255,7 +249,7 @@ namespace Assets.Script.WallMode
             return null;
         }
 
-        public virtual List<Cell> GetPath(Cell cellCurrent1, Cell cellStart1, Dictionary<Cell, Cell> parent)
+        private List<Cell> GetPath(Cell cellCurrent1, Cell cellStart1, Dictionary<Cell, Cell> parent)
         {
 
             List<Cell> path = new List<Cell>();
@@ -275,15 +269,14 @@ namespace Assets.Script.WallMode
             return path;
         }
 
-        public virtual bool IsValidPath(List<Cell> path1)
+        private bool IsValidPath(List<Cell> path1)
         {
             List<Cell> path = new List<Cell>();
             path.AddRange(path1);
-
             return GetChangeDirection(path) <= 2;
         }
 
-        public virtual int GetChangeDirection(List<Cell> path)
+        private int GetChangeDirection(List<Cell> path)
         {
             int cnt = 0;
             var baseCell = new Cell(path[0].i, path[0].j);
@@ -296,12 +289,18 @@ namespace Assets.Script.WallMode
                     cnt++;
                 }
 
+                //WALL MODE
+                if (Wall.IsBlockByBrick(path[i].i, path[i].j))
+                {
+                    return 100;
+                }
+
             }
 
             return cnt;
         }
 
-        public virtual void PrintPath(List<Cell> path)
+        void PrintPath(List<Cell> path)
         {
             if (path == null)
             {
@@ -317,7 +316,7 @@ namespace Assets.Script.WallMode
             }
         }
 
-        public virtual List<Vector3> GetListPosition(List<Cell> path)
+        private List<Vector3> GetListPosition(List<Cell> path)
         {
             var res = new List<Vector3>();
             Sprite firstSprite = BaseWall.lstSprites[0];
@@ -339,19 +338,19 @@ namespace Assets.Script.WallMode
             return res;
         }
 
-        public virtual void DrawPath(List<Vector3> positions)
+        private void DrawPath(List<Vector3> positions)
         {
-            if (lineRenderer != null) Destroy(lineRenderer.gameObject);
+            //if (lineRenderer != null) Destroy(lineRenderer.gameObject);
             DeleteObjectsWithName("line");
             // Nếu có ít nhất 2 GameObject được tìm thấy
             if (positions.Count >= 2)
             {
                 // Tạo một game object mới để chứa đối tượng LineRenderer
-                lineObject = new GameObject("line");
+                GameObject lineObject = new GameObject("line");
                 lineObject.transform.SetParent(BaseWall.gridParent);
 
                 // Thêm component LineRenderer vào game object mới
-                lineRenderer = lineObject.AddComponent<LineRenderer>();
+                LineRenderer lineRenderer = lineObject.AddComponent<LineRenderer>();
                 lineRenderer.material = lineMaterial;  // Gán vật liệu cho LineRenderer
                 lineRenderer.startWidth = lineWidth;
                 lineRenderer.endWidth = lineWidth;
@@ -368,20 +367,22 @@ namespace Assets.Script.WallMode
                 }
                 lineRenderer.sortingLayerName = "Default";
                 lineRenderer.sortingOrder = 1;
-                StartCoroutine(DestroyLineAfterDelay(1f, lineRenderer));
+
+                StartCoroutine(DestroyLineAfterDelay(1f, lineObject));
+
             }
         }
 
-        public virtual IEnumerator DestroyLineAfterDelay(float delay, LineRenderer lineRenderer)
+        private IEnumerator DestroyLineAfterDelay(float delay, GameObject _lineObject)
         {
-            yield return new WaitForSeconds(delay);
-            if (lineRenderer != null)
+
+            if (_lineObject != null)
             {
-                Destroy(lineRenderer.gameObject);
+                yield return new WaitForSeconds(delay);
+                Destroy(_lineObject);
             }
         }
-
-        public virtual void DeleteObjectsWithName(string objectName)
+        private void DeleteObjectsWithName(string objectName)
         {
             GameObject[] objectsToDelete = GameObject.FindObjectsOfType<GameObject>();
 
@@ -398,23 +399,27 @@ namespace Assets.Script.WallMode
             }
         }
 
-        public virtual void IncreaseScore()
+        //SCORE
+        public void IncreaseScore()
         {
             if (countdownTimer.isCountingDown)
             {
-                score += 1;
+                score += Mathf.CeilToInt(countdownTimer.getCurrentTime() / 5);
 
                 UpdateScoreText();
             }
         }
 
-        public virtual void UpdateScoreText()
+        private void UpdateScoreText()
         {
             scoreText.text = "Score: " + score.ToString();
         }
 
-        public virtual void Hint()
+
+        //HINT
+        public Tuple<GameObject, GameObject> getObjHint()
         {
+
             bool allCellsProcessed = false;
 
             while (!allCellsProcessed)
@@ -425,45 +430,53 @@ namespace Assets.Script.WallMode
                 {
                     for (int j = 1; j <= BaseWall.n; j++)
                     {
+                        if (Wall.IsBlockByBrick(i, j) || BaseWall.MATRIX[i, j] == 0) continue;
                         GameObject obj = GameObject.Find(i + "," + j);
 
                         if (obj != null)
                         {
-
-                            if (CheckAndProcessMatrix2(obj) == true)
+                            var obj2 = GetHintObj2(obj);
+                            if (obj2 != null)
                             {
-                                var renderer = obj.GetComponent<SpriteRenderer>();
-                                SetHighlightedColor(renderer);
-                                return;
+                                return new Tuple<GameObject, GameObject>(obj, obj2);
                             }
 
                         }
                     }
                 }
             }
+            return null;
         }
 
-        public virtual bool CheckAndProcessMatrix2(GameObject obj)
+        private bool isObjHint(GameObject obj1, GameObject obj2)
+        {
+            if (obj1 == null || obj2 == null) return false;
+            if (isNullCacheHint()) return false;
+            if (cacheHint.Item1.name == obj1.name || cacheHint.Item2.name == obj2.name) return true;
+            if (cacheHint.Item1.name == obj2.name || cacheHint.Item2.name == obj1.name) return true;
+            return false;
+        }
+        
+        private GameObject GetHintObj2(GameObject obj)
         {
             if (obj == null)
             {
                 Debug.Log("GameObject is null.");
-                return false;
+                return null;
             }
-
-
 
             Cell cell = BaseWall.GetCell(obj.name);
             if (cell == null)
             {
                 Debug.Log("Cell not found for the GameObject.");
-                return false;
+                return null;
             }
 
             for (int k = 1; k <= BaseWall.m; k++)
             {
                 for (int l = 1; l <= BaseWall.n; l++)
                 {
+                    if (Wall.IsBlockByBrick(k, l) || BaseWall.MATRIX[k, l] == 0) continue;
                     GameObject obj2 = GameObject.Find(k + "," + l);
                     if (obj2 != null && obj != null)
                     {
@@ -472,11 +485,7 @@ namespace Assets.Script.WallMode
                             var path = FindPath(cell, BaseWall.GetCell(obj2.name));
                             if (path != null)
                             {
-                                var renderer = obj2.GetComponent<SpriteRenderer>();
-                                //DrawPath(lstPos);
-                                SetHighlightedColor(renderer);
-
-                                return true;
+                                return obj2;
                             }
                             else
                             {
@@ -487,18 +496,62 @@ namespace Assets.Script.WallMode
                 }
 
             }
+            return null;
+        }
+
+
+        public bool isNullCacheHint()
+        {
+            if (cacheHint == null) return true;
+            if (cacheHint.Item1 == null || cacheHint.Item2 == null)
+            {
+                return true;
+            }
             return false;
         }
 
-        public virtual void SetHighlightedColor(SpriteRenderer renderer)
+        //AUTO MATCH
+        private void Autoplay()
         {
-            renderer.color = highlightColor;
+
+            //Base resetBase = new Base();
+            //var hintPath = getPathHint();
+            //while (hintPath != null)
+            //{
+            //    var lstPos = GetListPosition(hintPath);
+            //    DrawPath(lstPos);
+
+            //    var cell1 = hintPath[0];
+            //    var cell2 = hintPath[hintPath.Count - 1];
+            //    var obj1 = Cell.GetGameObject(cell1);
+            //    var obj2 = Cell.GetGameObject(cell2);
+
+            //    Destroy(obj1);
+            //    Destroy(obj2);
+            //    size = size - 2;
+            //    IncreaseScore();
+            //    var val1 = Base.MATRIX[cell1.i, cell1.j];
+
+            //    Base.FREQUENCY[val1] -= 2;
+            //    if (!Base.FREQUENCY.ContainsKey(0))
+            //    {
+            //        Base.FREQUENCY[0] = 0;
+            //    }
+            //    Base.FREQUENCY[0] += 2;
+
+            //    Base.MATRIX[cell1.i, cell1.j] = 0;
+            //    Base.MATRIX[cell2.i, cell2.j] = 0;
+            //    Debug.Log(DateTime.Now.Millisecond + "<color=green>SUCCESS</color>");
+
+            //    //WALL MODE
+            //    Wall.RemoveABrick();
+            //    while (getPathHint() == null && !Base.IsMatrixNull())
+            //    {
+            //        resetBase.ResetMatrix();
+            //    }
+            //}
+
         }
 
-        public virtual void RestoreOriginalColor(SpriteRenderer renderer)
-        {
-            // Đặt màu ban đầu của vật thể tại đây (ví dụ: màu trắng)
-            renderer.color = UnityEngine.Color.white;
-        }
     }
 }

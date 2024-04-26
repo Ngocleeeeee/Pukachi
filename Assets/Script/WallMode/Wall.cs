@@ -12,10 +12,26 @@ namespace Assets.Script.WallMode
         private static List<GameObject> lstWallObject;
         private static List<Cell> lstBrick;
 
-        public Wall(List<int> rows, List<int> cols)
+        public Wall(int[] rows, int[] cols)
         {
-            Rows = rows;
-            Cols = cols;
+            Rows = getRandomWall(rows, false);
+            Cols = getRandomWall(cols);
+        }
+
+        private List<int> getRandomWall(int[] numbers, bool full = true)
+        {
+            var res = new List<int>();
+            System.Random random = new System.Random();
+            int randomNumber1 = numbers[random.Next(numbers.Length)];
+            int randomNumber2;
+            do
+            {
+                randomNumber2 = numbers[random.Next(numbers.Length)];
+            } while (randomNumber2 == randomNumber1);
+            res.Add(randomNumber1);
+            if (full) res.Add(randomNumber2);
+
+            return res;
         }
 
         public void GenerateWall()
@@ -83,6 +99,7 @@ namespace Assets.Script.WallMode
 
         public static void RemoveABrick()
         {
+            if (lstWallObject.Count == 0) return;
             System.Random random = new System.Random();
             var randomNumber = random.Next(0, lstWallObject.Count - 1);
             var selectedBrick = lstWallObject[randomNumber];

@@ -24,7 +24,7 @@ public class PanelManeger : MonoBehaviour
     }
     public void backToGame()
     {
-        if (classicTimer.currentTime <= 230f)
+        if (classicTimer.currentTime <= 0f)
         {
             panelGuide.SetActive(false);
             panelOptions.SetActive(false) ;

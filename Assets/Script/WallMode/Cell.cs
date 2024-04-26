@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets.Script.WallMode
 {
@@ -20,25 +21,25 @@ namespace Assets.Script.WallMode
             this.j = j;
             this.val = val;
         }
-        public void SetCell(Cell Cell2)
+        public void SetCell(Cell cell2)
         {
-            this.i = Cell2.i;
-            this.j = Cell2.j;
+            this.i = cell2.i;
+            this.j = cell2.j;
         }
 
-        public List<Cell> Move(Cell CellFinal)
+        public List<Cell> Move(Cell cellFinal)
         {
 
             var lstNextState = new List<Cell>();
             var lstCase = new List<Cell>();
 
-            if (j + 1 <= BaseWall.n+1) lstCase.Add(new Cell(i, j + 1));
-            if (i + 1 <= BaseWall.m+1) lstCase.Add(new Cell(i + 1, j));
+            if (j + 1 <= BaseWall.n + 1) lstCase.Add(new Cell(i, j + 1));
+            if (i + 1 <= BaseWall.m + 1) lstCase.Add(new Cell(i + 1, j));
             if (j - 1 >= 0) lstCase.Add(new Cell(i, j - 1));
             if (i - 1 >= 0) lstCase.Add(new Cell(i - 1, j));
             foreach (var c in lstCase)
             {
-                if (BaseWall.MATRIX[c.i, c.j] == 0|| c.Equals(CellFinal))
+                if (BaseWall.MATRIX[c.i, c.j] == 0 || c.Equals(cellFinal))
                 {
                     lstNextState.Add(c);
                 }
@@ -55,9 +56,9 @@ namespace Assets.Script.WallMode
 
         public override bool Equals(object obj)
         {
-            return obj is Cell Cell &&
-                   i == Cell.i &&
-                   j == Cell.j;
+            return obj is Cell cell &&
+                   i == cell.i &&
+                   j == cell.j;
         }
 
         public override int GetHashCode()
@@ -65,11 +66,33 @@ namespace Assets.Script.WallMode
             return HashCode.Combine(i, j);
         }
 
-        public static Cell operator -(Cell Cell1, Cell Cell2)
+        public static Cell operator -(Cell cell1, Cell cell2)
         {
-            int resultX = Cell1.i - Cell2.i;
-            int resultY = Cell1.j - Cell2.j;
+            int resultX = cell1.i - cell2.i;
+            int resultY = cell1.j - cell2.j;
             return new Cell(resultX, resultY);
+        }
+
+        public static GameObject GetGameObject(Cell cell)
+        {
+            string objName = cell.i + "," + cell.j;
+            GameObject gridParentObject = GameObject.FindWithTag("Grid");
+
+            // Kiểm tra nếu đối tượng cha tồn tại
+            if (gridParentObject != null)
+            {
+                // Lấy danh sách các đối tượng con
+                Transform parentTransform = gridParentObject.transform;
+                int childCount = parentTransform.childCount;
+
+                for (int i = 0; i < childCount; i++)
+                {
+                    var childObj = parentTransform.GetChild(i).gameObject;
+                    if (childObj.name == objName) return childObj;
+                }
+
+            }
+            return null;
         }
 
 
