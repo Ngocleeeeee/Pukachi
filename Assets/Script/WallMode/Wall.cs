@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
+ 
 
 namespace Assets.Script.WallMode
 {
@@ -18,11 +13,27 @@ namespace Assets.Script.WallMode
         public List<int> Cols { get; set; }
         private static List<GameObject> lstWallObject;
         private static List<Cell> lstBrick;
-
-        public Wall(List<int> rows, List<int> cols)
+        public Wall(int[] rows, int[] cols)
         {
-            Rows = rows;
-            Cols = cols;
+            Rows = getRandomWall(rows, false);
+            Cols = getRandomWall(cols);
+        }
+
+        private List<int> getRandomWall(int[] numbers, bool full = true)
+        {
+            var res = new List<int>();
+            System.Random random = new System.Random();
+            int randomNumber1 = numbers[random.Next(numbers.Length)];
+            int randomNumber2;
+            do
+            {
+                randomNumber2 = numbers[random.Next(numbers.Length)];
+            } while (randomNumber2 == randomNumber1);
+            res.Add(randomNumber1);
+            if (full) res.Add(randomNumber2);
+
+            return res;
+ 
         }
 
         public void GenerateWall()
@@ -34,7 +45,8 @@ namespace Assets.Script.WallMode
         {
 
             lstBrick = new List<Cell>();
-            for (int j = 0; j < Base.n + 2; j++)
+            for (int j = 0; j < BaseWall.n + 2; j++)
+ 
             {
                 foreach (var row in Rows)
                 {
@@ -43,7 +55,9 @@ namespace Assets.Script.WallMode
 
             }
 
-            for (int i = 0; i < Base.m + 2; i++)
+
+            for (int i = 0; i < BaseWall.m + 2; i++)
+ 
             {
                 foreach (var col in Cols)
                 {
@@ -61,7 +75,8 @@ namespace Assets.Script.WallMode
 
         private void DrawWall()
         {
-            Sprite firstSprite = Base.lstSprites[0];
+            Sprite firstSprite = BaseWall.lstSprites[0];
+ 
             var brickWidth = firstSprite.bounds.size.x;
             var brickHeight = firstSprite.bounds.size.y;
 
@@ -75,7 +90,9 @@ namespace Assets.Script.WallMode
             foreach (var cell in lstBrick)
             {
                 GameObject brick;
-                brick = GameObject.Instantiate(wallOBJ, Base.gridParent);
+
+                brick = GameObject.Instantiate(wallOBJ, BaseWall.gridParent);
+ 
                 brick.name = $"!{cell.i}:{cell.j}";
                 SpriteRenderer spriteRenderer = brick.GetComponent<SpriteRenderer>();
                 spriteRenderer.sortingOrder = 100;
@@ -90,6 +107,9 @@ namespace Assets.Script.WallMode
 
         public static void RemoveABrick()
         {
+
+            if (lstWallObject.Count == 0) return;
+ 
             System.Random random = new System.Random();
             var randomNumber = random.Next(0, lstWallObject.Count - 1);
             var selectedBrick = lstWallObject[randomNumber];

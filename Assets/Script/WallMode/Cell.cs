@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using UnityEngine;
 
 namespace Assets.Script.WallMode
@@ -36,13 +34,16 @@ namespace Assets.Script.WallMode
             var lstNextState = new List<Cell>();
             var lstCase = new List<Cell>();
 
-            if (j + 1 <= Base.n+1) lstCase.Add(new Cell(i, j + 1));
-            if (i + 1 <= Base.m+1) lstCase.Add(new Cell(i + 1, j));
+            if (j + 1 <= BaseWall.n + 1) lstCase.Add(new Cell(i, j + 1));
+            if (i + 1 <= BaseWall.m + 1) lstCase.Add(new Cell(i + 1, j));
+
             if (j - 1 >= 0) lstCase.Add(new Cell(i, j - 1));
             if (i - 1 >= 0) lstCase.Add(new Cell(i - 1, j));
             foreach (var c in lstCase)
             {
-                if (Base.MATRIX[c.i, c.j] == 0|| c.Equals(cellFinal))
+
+                if (BaseWall.MATRIX[c.i, c.j] == 0 || c.Equals(cellFinal))
+ 
                 {
                     lstNextState.Add(c);
                 }
@@ -74,6 +75,29 @@ namespace Assets.Script.WallMode
             int resultX = cell1.i - cell2.i;
             int resultY = cell1.j - cell2.j;
             return new Cell(resultX, resultY);
+        }
+
+
+        public static GameObject GetGameObject(Cell cell)
+        {
+            string objName = cell.i + "," + cell.j;
+            GameObject gridParentObject = GameObject.FindWithTag("Grid");
+
+            // Kiểm tra nếu đối tượng cha tồn tại
+            if (gridParentObject != null)
+            {
+                // Lấy danh sách các đối tượng con
+                Transform parentTransform = gridParentObject.transform;
+                int childCount = parentTransform.childCount;
+
+                for (int i = 0; i < childCount; i++)
+                {
+                    var childObj = parentTransform.GetChild(i).gameObject;
+                    if (childObj.name == objName) return childObj;
+                }
+
+            }
+            return null;
         }
 
 
